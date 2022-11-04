@@ -1,15 +1,11 @@
 from flask import Flask, flash, request, redirect, url_for, render_template
-import urllib.request
 import os
 from werkzeug.utils import secure_filename
 import numpy as np
-import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow.keras import models, layers
-import matplotlib.pyplot as plt
 from tensorflow.keras.models import load_model
 import sqlite3 as sq
-
 from PIL import Image
 from tensorflow import keras
 
@@ -20,7 +16,7 @@ def predict():
     class_names = ['Tomato_Bacterial_spot','Tomato_Early_blight','Tomato_Late_blight','Tomato_Leaf_Mold','Tomato_Septoria_leaf_spot', 'Tomato_Spider_mites_Two_spotted_spider_mite', 'Tomato_Target_Spot', 'TomatoTomato_YellowLeafCurl_Virus','Tomato_Tomato_mosaic_virus','Tomato_healthy']
 
     
-    img = np.array(Image.open('static/uploads/upload.jpg'))
+    img = np.array(Image.open('static/uploads/upload.JPG'))
     imgb = np.expand_dims(img,0)
     predictions = model.predict(imgb)
     index = np.argmax(predictions[0])
