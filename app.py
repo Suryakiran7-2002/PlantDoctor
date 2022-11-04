@@ -8,15 +8,18 @@ from tensorflow.keras.models import load_model
 import sqlite3 as sq
 from PIL import Image
 from tensorflow import keras
+import base64
+from io import BytesIO
 
 model = tf.keras.models.load_model("2")
 #model = keras.models.load_model('model.h5')
 #ask pranav
-def predict():
+def predict(img):
     class_names = ['Tomato_Bacterial_spot','Tomato_Early_blight','Tomato_Late_blight','Tomato_Leaf_Mold','Tomato_Septoria_leaf_spot', 'Tomato_Spider_mites_Two_spotted_spider_mite', 'Tomato_Target_Spot', 'TomatoTomato_YellowLeafCurl_Virus','Tomato_Tomato_mosaic_virus','Tomato_healthy']
 
     
-    img = np.array(Image.open('static/uploads/upload.JPG'))
+    #img = np.array(Image.open('static/uploads/upload.JPG'))
+    img = np.array(img)
     imgb = np.expand_dims(img,0)
     predictions = model.predict(imgb)
     index = np.argmax(predictions[0])
@@ -49,17 +52,22 @@ def upload_image():
             flash('No file part')
             return redirect(request.url)
         file = request.files['file']
-            
+        
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'upload.JPG'))
+            img = Image.open(file)
+            #file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'upload.JPG'))
             
-            flash('Image successfully uploaded and displayed below')
             
-            data,conf = predict()
+            
+            data,conf = predict(img)
             #delete file
+            with BytesIO() as buf:
+                img.save(buf, 'jpeg')
+                image_bytes = buf.getvalue()
+            encoded_string = base64.b64encode(image_bytes).decode()
             
-            return render_template('home.html',op = 1,data = data,conf = conf)
+            return render_template('home.html',op = 1,data = data,conf = conf,img_data=encoded_string)
         else:
             flash('Allowed image types are - png, jpg, jpeg, gif')
             return redirect(request.url)
